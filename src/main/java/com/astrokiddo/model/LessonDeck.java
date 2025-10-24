@@ -17,9 +17,6 @@ public class LessonDeck {
     private Instant createdAt;
     private List<Slide> slides = new ArrayList<>();
 
-    public LessonDeck() {
-    }
-
     public LessonDeck(String topic) {
         this.id = "deck-" + UUID.randomUUID();
         this.topic = topic;

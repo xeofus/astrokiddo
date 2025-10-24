@@ -19,7 +19,7 @@ export class AppComponent {
     loading = false;
     error?: string;
 
-    constructor(private fb: FormBuilder, private deckSvc: DeckService, private http: HttpClient) {
+    constructor(private fb: FormBuilder, private deckSvc: DeckService) {
         this.form = new FormGroup({
             topic: new FormControl('spiral galaxies'),
             gradeLevel: new FormControl('8-10'),

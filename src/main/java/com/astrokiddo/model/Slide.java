@@ -13,9 +13,6 @@ public class Slide {
     private String imageUrl;
     private String attribution;
 
-    public Slide() {
-    }
-
     public Slide(SlideType type, String title, String text, String imageUrl, String attribution) {
         this.type = type;
         this.title = title;
