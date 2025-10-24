@@ -1,0 +1,14 @@
+
+server:
+  port: ${SERVER_PORT:8080}
+
+app:
+  nasa:
+    apiKey: ${NASA_API_KEY}
+    apodBaseUrl: https://api.nasa.gov/planetary/apod
+    imagesBaseUrl: https://images-api.nasa.gov
+
+logging:
+  level:
+    root: INFO
+    com.astrokiddo: DEBUG

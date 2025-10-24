@@ -1,0 +1,36 @@
+
+{
+  "version": 1,
+  "projects": {
+    "astrokiddo-web": {
+      "projectType": "application",
+      "root": "",
+      "sourceRoot": "src",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/astrokiddo-web",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": [],
+            "tsConfig": "tsconfig.app.json",
+            "assets": ["src/favicon.ico","src/assets"],
+            "styles": ["src/styles.css"]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [{ "type":"initial","maximumWarning":"2MB","maximumError":"5MB"}]
+            }
+          }
+        },
+        "serve": { "builder":"@angular-devkit/build-angular:dev-server",
+          "options": { "browserTarget":"astrokiddo-web:build" } }
+      }
+    }
+  },
+  "defaultProject": "astrokiddo-web",
+  "cli": {
+    "analytics": false
+  }
+}
