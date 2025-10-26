@@ -1,4 +1,3 @@
-
 package com.astrokiddo.dto;
 
 import jakarta.validation.constraints.NotBlank;

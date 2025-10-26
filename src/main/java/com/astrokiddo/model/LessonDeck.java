@@ -1,4 +1,3 @@
-
 package com.astrokiddo.model;
 
 import lombok.Getter;

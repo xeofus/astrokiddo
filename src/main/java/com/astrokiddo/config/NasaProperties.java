@@ -1,4 +1,3 @@
-
 package com.astrokiddo.config;
 
 import lombok.Getter;
