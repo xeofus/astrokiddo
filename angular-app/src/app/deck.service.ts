@@ -27,7 +27,7 @@ export interface DeckEnrichment {
     vocabulary?: VocabularyItem[];
     fun_fact?: string;
     attribution?: string;
-    _meta?: EnrichmentMeta;
+    meta?: EnrichmentMeta;
 }
 
 export interface LessonDeck {

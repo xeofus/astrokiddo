@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import {DeckEnrichment, DeckService, GenerateReq, LessonDeck} from './deck.service';
-import {saveAs} from 'file-saver';
+import {saveAs} from 'file-saver-es';
 import {firstValueFrom} from "rxjs";
 
 @Component({
@@ -14,9 +14,9 @@ import {firstValueFrom} from "rxjs";
 export class AppComponent {
 
     public form: FormGroup;
-    deck?: LessonDeck;
-    loading = false;
-    error?: string;
+    public deck?: LessonDeck;
+    public loading = false;
+    public error?: string;
 
     constructor(private deckSvc: DeckService) {
         this.form = new FormGroup({
