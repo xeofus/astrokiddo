@@ -29,6 +29,7 @@ public class LessonGeneratorService {
         this.enricherClient = enricherClient;
     }
 
+    // TODO: turn off minusMonth after shutdown
     public Mono<LessonDeck> generate(GenerateDeckRequestDto req) {
         String topic = req.getTopic().trim();
         Mono<ImageSearchResponseDto> images =
@@ -36,7 +37,7 @@ public class LessonGeneratorService {
                 .switchIfEmpty(Mono.just(new ImageSearchResponseDto()))
                 .onErrorReturn(new ImageSearchResponseDto());
         Mono<ApodResponseDto> apod =
-                cache.getApod(LocalDate.now())
+                cache.getApod(LocalDate.now().minusMonths(2))
                 .switchIfEmpty(Mono.just(new ApodResponseDto()))
                 .onErrorResume(ex -> Mono.just(new ApodResponseDto()));
 

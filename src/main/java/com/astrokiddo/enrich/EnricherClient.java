@@ -52,7 +52,7 @@ public class EnricherClient {
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(EnrichmentResponse.class)
-                .timeout(Duration.ofSeconds(8))
+                .timeout(Duration.ofSeconds(60))
                 .retryWhen(Retry.backoff(1, Duration.ofMillis(250))
                         .maxBackoff(Duration.ofSeconds(1))
                         .jitter(0.2)
