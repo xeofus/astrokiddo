@@ -72,7 +72,7 @@ services:
       - "8080:8080"
     environment:
       - ENRICHER_BASE_URL=http://enricher:8090
-      - NASA_API_KEY=${NASA_API_KEY}jeLVcy4YdpivFWvRfDHeJasJicNSS1OYweFwqJvP
+      - NASA_API_KEY=${NASA_API_KEY}
     restart: unless-stopped
     networks:
       - ai_net

@@ -66,3 +66,6 @@ build/
 /ui/angular-app/npm-debug.log*
 /ui/angular-app/yarn-debug.log*
 /ui/angular-app/yarn-error.log*
+
+#Ollama
+./ollama

@@ -36,6 +36,21 @@ public class WebClientConfig {
         return base(props.getImagesBaseUrl(), nasaConnProvider);
     }
 
+    @Bean
+    public ConnectionProvider enricherConnProvider() {
+        return ConnectionProvider.builder("enricher")
+                .maxConnections(20)
+                .pendingAcquireTimeout(Duration.ofSeconds(5))
+                .maxIdleTime(Duration.ofSeconds(30))
+                .maxLifeTime(Duration.ofMinutes(2))
+                .build();
+    }
+
+    @Bean
+    public WebClient enricherWebClient(EnricherProperties props, ConnectionProvider enricherConnProvider) {
+        return base(props.getBaseUrl(), enricherConnProvider);
+    }
+
     private WebClient base(String baseUrl, ConnectionProvider provider) {
         HttpClient httpClient = HttpClient.create(provider)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
