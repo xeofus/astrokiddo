@@ -39,33 +39,33 @@ build/
 *.tmp
 
 # Angular specific
-/ui/angular-app/dist/
-/ui/angular-app//out-tsc/
-/ui/angular-app/tmp/
-/ui/angular-app/coverage/
-/ui/angular-app/e2e/test-output/
-/ui/angular-app/.angular/
+/angular-app/dist/
+/angular-app//out-tsc/
+/angular-app/tmp/
+/angular-app/coverage/
+/angular-app/e2e/test-output/
+/angular-app/.angular/
 /ui/angular-app.angular/
 
 # Node modules and dependency files
-/ui/angular-app/node_modules/
-/ui/angular-app/package-lock.json
-/ui/angular-app/yarn.lock
+/angular-app/node_modules/
+/angular-app/package-lock.json
+/angular-app/yarn.lock
 
 # Environment files
-/ui/angular-app/.env
+/angular-app/.env
 
 # Angular CLI and build artefacts
-/ui/angular-app/.angular-cli.json
-/ui/angular-app/.ng/
+/angular-app/.angular-cli.json
+/angular-app/.ng/
 
 # TypeScript cache
 *.tsbuildinfo
 
 # Logs
-/ui/angular-app/npm-debug.log*
-/ui/angular-app/yarn-debug.log*
-/ui/angular-app/yarn-error.log*
+/angular-app/npm-debug.log*
+/angular-app/yarn-debug.log*
+/angular-app/yarn-error.log*
 
 #Ollama
 ./ollama

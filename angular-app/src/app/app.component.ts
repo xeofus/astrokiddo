@@ -1,9 +1,9 @@
 import {Component} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
-import {HttpClient} from '@angular/common/http';
-import {DeckService, GenerateReq, LessonDeck} from './deck.service';
+import {DeckEnrichment, DeckService, GenerateReq, LessonDeck} from './deck.service';
 import {saveAs} from 'file-saver';
+import {firstValueFrom} from "rxjs";
 
 @Component({
     selector: 'app-root',
@@ -19,7 +19,7 @@ export class AppComponent {
     loading = false;
     error?: string;
 
-    constructor(private fb: FormBuilder, private deckSvc: DeckService) {
+    constructor(private deckSvc: DeckService) {
         this.form = new FormGroup({
             topic: new FormControl('spiral galaxies'),
             gradeLevel: new FormControl('8-10'),
@@ -33,12 +33,33 @@ export class AppComponent {
         this.loading = true;
         try {
             const req: GenerateReq = this.form.getRawValue();
-            this.deck = await this.deckSvc.generate(req).toPromise();
+            this.deck = await firstValueFrom(this.deckSvc.generate(req));
         } catch (e: any) {
             this.error = e?.message || 'Failed to generate deck';
         } finally {
             this.loading = false;
         }
+    }
+
+    hasEnrichment(enrichment?: DeckEnrichment | null): boolean {
+        if (!enrichment) {
+            return false;
+        }
+        const {
+            hook,
+            simple_explanation,
+            why_it_matters,
+            class_question,
+            fun_fact,
+            vocabulary,
+            attribution
+        } = enrichment;
+
+        const hasText = [hook, simple_explanation, why_it_matters, class_question, fun_fact, attribution]
+            .some(value => typeof value === 'string' && value.trim().length > 0);
+        const hasVocabulary = Array.isArray(vocabulary) && vocabulary.length > 0;
+
+        return hasText || hasVocabulary;
     }
 
     exportHtml() {

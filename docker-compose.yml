@@ -71,14 +71,14 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - ENRICHER_BASE_URL=http://enricher:8090
+      - ENRICHER_BASE_URL=https://enricher.thekann.com
       - NASA_API_KEY=${NASA_API_KEY}
     restart: unless-stopped
     networks:
       - ai_net
 
   frontend:
-    build: ./ui/angular-app
+    build: angular-app
     container_name: frontend
     depends_on:
       backend:
