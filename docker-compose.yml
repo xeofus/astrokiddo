@@ -68,9 +68,10 @@ services:
     depends_on:
       enricher:
         condition: service_healthy
-    ports:
-      - "8080:8080"
+    expose:
+      - "8091"
     environment:
+      - BACKEND_SERVER_PORT=${BACKEND_SERVER_PORT}
       - ENRICHER_BASE_URL=${ENRICHER_BASE_URL}
       - NASA_API_KEY=${NASA_API_KEY}
     restart: unless-stopped
@@ -83,8 +84,8 @@ services:
     depends_on:
       backend:
         condition: service_started
-    ports:
-      - "8081:80"
+    expose:
+      - "8092"
     restart: unless-stopped
     networks:
       - ai_net
