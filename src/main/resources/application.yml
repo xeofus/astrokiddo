@@ -1,16 +1,16 @@
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:8091}
 
 app:
   nasa:
     apiKey: ${NASA_API_KEY}
-    apodBaseUrl: https://api.nasa.gov/planetary/apod
-    imagesBaseUrl: https://images-api.nasa.gov
+    apodBaseUrl: ${APOD_BASE_URL}
+    imagesBaseUrl: ${IMAGES_BASE_URL}
   enricher:
     baseUrl: ${ENRICHER_BASE_URL}
-    enabled: ${ENRICHER_ENABLED:true}
-    maxVocabulary: ${ENRICHER_MAX_VOCAB:3}
-    temperature: ${ENRICHER_TEMPERATURE:0.6}
+    enabled: ${ENRICHER_ENABLED}
+    maxVocabulary: ${ENRICHER_MAX_VOCAB}
+    temperature: ${ENRICHER_TEMPERATURE}
 logging:
   level:
     root: INFO

@@ -10,7 +10,7 @@ RUN mvn -q -DskipTests package
 # Run
 FROM eclipse-temurin:17-jre
 WORKDIR /app
-ENV SERVER_PORT=8080
-EXPOSE 8080
+ENV SERVER_PORT=8091
+EXPOSE 8091
 COPY --from=build /app/target/astrokiddo-0.1.0.jar app.jar
 ENTRYPOINT ["sh","-c","java -jar /app/app.jar"]
