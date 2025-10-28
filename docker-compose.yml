@@ -48,7 +48,7 @@ services:
       init-ollama:
         condition: service_completed_successfully
     environment:
-      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL}
       - OLLAMA_MODEL=${OLLAMA_MODEL}
       - OLLAMA_NUM_CTX=${OLLAMA_NUM_CTX}
     expose:
@@ -71,7 +71,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - ENRICHER_BASE_URL=https://enricher.thekann.com
+      - ENRICHER_BASE_URL=${ENRICHER_BASE_URL}
       - NASA_API_KEY=${NASA_API_KEY}
     restart: unless-stopped
     networks:
