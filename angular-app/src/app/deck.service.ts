@@ -10,11 +10,32 @@ export interface Slide {
     attribution?: string;
 }
 
+export interface VocabularyItem {
+    term: string;
+    definition: string;
+}
+
+export interface EnrichmentMeta {
+    model?: string;
+}
+
+export interface DeckEnrichment {
+    hook?: string;
+    simple_explanation?: string;
+    why_it_matters?: string;
+    class_question?: string;
+    vocabulary?: VocabularyItem[];
+    fun_fact?: string;
+    attribution?: string;
+    meta?: EnrichmentMeta;
+}
+
 export interface LessonDeck {
     id: string;
     topic: string;
     createdAt: string;
     slides: Slide[];
+    enrichment?: DeckEnrichment;
 }
 
 export interface GenerateReq {

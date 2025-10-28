@@ -1,6 +1,6 @@
-
 package com.astrokiddo.model;
 
+import com.astrokiddo.enrich.EnrichmentResponse;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +16,7 @@ public class LessonDeck {
     private String topic;
     private Instant createdAt;
     private List<Slide> slides = new ArrayList<>();
+    private EnrichmentResponse enrichment;
 
     public LessonDeck(String topic) {
         this.id = "deck-" + UUID.randomUUID();

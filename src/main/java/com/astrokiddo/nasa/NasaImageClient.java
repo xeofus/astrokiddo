@@ -1,4 +1,3 @@
-
 package com.astrokiddo.nasa;
 
 import com.astrokiddo.dto.ImageSearchResponseDto;

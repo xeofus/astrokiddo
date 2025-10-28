@@ -1,20 +1,23 @@
-
 package com.astrokiddo.config;
 
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 
 import java.time.Duration;
 
+@Slf4j
 @Configuration
 public class WebClientConfig {
     @Bean
@@ -37,15 +40,30 @@ public class WebClientConfig {
         return base(props.getImagesBaseUrl(), nasaConnProvider);
     }
 
+    @Bean
+    public ConnectionProvider enricherConnProvider() {
+        return ConnectionProvider.builder("enricher")
+                .maxConnections(20)
+                .pendingAcquireTimeout(Duration.ofSeconds(5))
+                .maxIdleTime(Duration.ofSeconds(30))
+                .maxLifeTime(Duration.ofMinutes(2))
+                .build();
+    }
+
+    @Bean
+    public WebClient enricherWebClient(EnricherProperties props, ConnectionProvider enricherConnProvider) {
+        return base(props.getBaseUrl(), enricherConnProvider);
+    }
+
     private WebClient base(String baseUrl, ConnectionProvider provider) {
         HttpClient httpClient = HttpClient.create(provider)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-                .responseTimeout(Duration.ofSeconds(10))
+                .responseTimeout(Duration.ofSeconds(60))
                 .compress(true)
                 .followRedirect(true)
                 .doOnConnected(conn -> conn
-                        .addHandlerLast(new ReadTimeoutHandler(10))
-                        .addHandlerLast(new WriteTimeoutHandler(10)));
+                        .addHandlerLast(new ReadTimeoutHandler(60))
+                        .addHandlerLast(new WriteTimeoutHandler(60)));
 
         return WebClient.builder()
                 .baseUrl(baseUrl)
@@ -54,6 +72,14 @@ public class WebClientConfig {
                 .exchangeStrategies(ExchangeStrategies.builder()
                         .codecs(c -> c.defaultCodecs().maxInMemorySize(8 * 1024 * 1024))
                         .build())
+                .filter(logRequest())
                 .build();
+    }
+
+    private ExchangeFilterFunction logRequest() {
+        return ExchangeFilterFunction.ofRequestProcessor(request -> {
+            log.info("WebClient Request: {} {}", request.method(), request.url());
+            return Mono.just(request);
+        });
     }
 }

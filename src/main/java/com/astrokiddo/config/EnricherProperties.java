@@ -6,11 +6,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "app.nasa")
+@ConfigurationProperties(prefix = "app.enricher")
 @Getter
 @Setter
-public class NasaProperties {
-    private String apiKey;
-    private String apodBaseUrl;
-    private String imagesBaseUrl;
+public class EnricherProperties {
+    private String baseUrl = "http://enricher:8090";
+    private boolean enabled = true;
+    private int maxVocabulary = 3;
+    private double temperature = 0.6;
 }

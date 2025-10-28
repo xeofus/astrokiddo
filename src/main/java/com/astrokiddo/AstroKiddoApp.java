@@ -1,4 +1,3 @@
-
 package com.astrokiddo;
 
 import org.springframework.boot.SpringApplication;

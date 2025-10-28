@@ -1,4 +1,3 @@
-
 package com.astrokiddo.templates;
 
 import com.astrokiddo.dto.ApodResponseDto;

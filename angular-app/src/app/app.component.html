@@ -1,0 +1,113 @@
+<div class="container">
+  <h1>AstroKiddo: Teacher Deck Builder</h1>
+  <div class="sub">Generate a 5-slide mini-lesson from NASA media and export to HTML/PDF.</div>
+
+  <div class="panel">
+    <div class="row">
+      @if (form) {
+        <form [formGroup]="form">
+          <input placeholder="Topic" type="text" formControlName="topic">
+          <input placeholder="Grade (e.g., 6-8)" type="text" formControlName="gradeLevel">
+          <select type="text" formControlName="locale">
+            <option value="en">English</option>
+          </select>
+        </form>
+      }
+      <button (click)="generate()" [disabled]="loading">{{ loading ? 'Generating...' : 'Generate' }}</button>
+    </div>
+    @if (error) {
+      <div class="warn">{{ error }}</div>
+    }
+  </div>
+
+  @if (deck) {
+    <div class="deck">
+      <div class="panel deck-meta">
+        <div class="meta-block">
+          <h2 class="meta-title">{{ deck.topic }}</h2>
+          <div class="meta-line">Deck ID: {{ deck.id }}</div>
+          <div class="meta-line">Created: {{ deck.createdAt | date: 'medium' }}</div>
+          @if (deck.enrichment?.meta?.model) {
+            <div class="meta-line">Model: {{ deck.enrichment.meta.model }}</div>
+          }
+        </div>
+        <div class="meta-actions">
+          <a class="btn" (click)="exportHtml()">⬇ Export HTML</a>
+          <a class="btn" (click)="exportPdf()">⬇ Export PDF</a>
+        </div>
+      </div>
+      @if (deck.enrichment; as enrich) {
+        @if (hasEnrichment(enrich)) {
+          <div class="panel enrichment">
+            <h2>Enrichment Highlights</h2>
+            <div class="enrichment-grid">
+              @if (enrich.hook) {
+                <section class="enrichment-section">
+                  <h3>Hook</h3>
+                  <p>{{ enrich.hook }}</p>
+                </section>
+              }
+              @if (enrich.simple_explanation) {
+                <section class="enrichment-section">
+                  <h3>Simple Explanation</h3>
+                  <p>{{ enrich.simple_explanation }}</p>
+                </section>
+              }
+              @if (enrich.why_it_matters) {
+                <section class="enrichment-section">
+                  <h3>Why It Matters</h3>
+                  <p>{{ enrich.why_it_matters }}</p>
+                </section>
+              }
+              @if (enrich.class_question) {
+                <section class="enrichment-section">
+                  <h3>Class Question</h3>
+                  <p>{{ enrich.class_question }}</p>
+                </section>
+              }
+              @if (enrich.fun_fact) {
+                <section class="enrichment-section">
+                  <h3>Fun Fact</h3>
+                  <p>{{ enrich.fun_fact }}</p>
+                </section>
+              }
+            </div>
+            @if (enrich.vocabulary?.length) {
+              <div class="enrichment-vocabulary">
+                <h3>Vocabulary</h3>
+                <ul class="vocab-list">
+                  @for (item of enrich.vocabulary; track item) {
+                    <li class="vocab-item">
+                      <div class="vocab-term">{{ item.term }}</div>
+                      <div class="vocab-definition">{{ item.definition }}</div>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+            @if (enrich.attribution) {
+              <div class="enrichment-footer">
+                Attribution: {{ enrich.attribution }}
+              </div>
+            }
+          </div>
+        }
+      }
+      <div class="cards">
+        @for (s of deck.slides; track s) {
+          <div class="card">
+            <div class="badge">{{ s.type }}</div>
+            <h3>{{ s.title }}</h3>
+            @if (s.imageUrl) {
+              <img [src]="s.imageUrl" alt="">
+            }
+            <p>{{ s.text }}</p>
+            @if (s.attribution) {
+              <div class="badge">© {{ s.attribution }}</div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
