@@ -1,7 +1,7 @@
 services:
   ollama:
     image: ollama/ollama:latest
-    container_name: ollama
+    container_name: astrokiddo-ollama
     expose:
       - "11434"
     environment:
@@ -20,37 +20,17 @@ services:
     networks:
       - ai_net
 
-  init-ollama:
-    image: curlimages/curl:8.10.1
-    container_name: init-ollama
-    depends_on:
-      ollama:
-        condition: service_started
-    command:
-      [
-        "sh","-lc",
-        "echo 'Pulling model ${OLLAMA_MODEL}' && \
-         curl -fsS -X POST http://ollama:11434/api/pull \
-         -H 'Content-Type: application/json' \
-         -d '{\"name\":\"'\"${OLLAMA_MODEL}\"'\"}' && \
-         echo 'Model ready'"
-      ]
-    restart: "no"
-    networks:
-      - ai_net
-
   enricher:
     build: ./enricher
-    container_name: enricher
+    container_name: astrokiddo-enricher
     depends_on:
       ollama:
         condition: service_healthy
-      init-ollama:
-        condition: service_completed_successfully
     environment:
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL}
       - OLLAMA_MODEL=${OLLAMA_MODEL}
       - OLLAMA_NUM_CTX=${OLLAMA_NUM_CTX}
+      - OLLAMA_WARMUP=${OLLAMA_WARMUP}
     expose:
       - "8090"
     healthcheck:
@@ -64,15 +44,17 @@ services:
 
   backend:
     build: .
-    container_name: backend
+    container_name: astrokiddo-backend
     depends_on:
       enricher:
         condition: service_healthy
     expose:
       - "8091"
     environment:
-      - BACKEND_SERVER_PORT=${BACKEND_SERVER_PORT}
+      - SERVER_PORT=8091
       - ENRICHER_BASE_URL=${ENRICHER_BASE_URL}
+      - APOD_BASE_URL=${APOD_BASE_URL}
+      - IMAGES_BASE_URL=${IMAGES_BASE_URL}
       - NASA_API_KEY=${NASA_API_KEY}
     restart: unless-stopped
     networks:
@@ -80,7 +62,7 @@ services:
 
   frontend:
     build: angular-app
-    container_name: frontend
+    container_name: astrokiddo-frontend
     depends_on:
       backend:
         condition: service_started

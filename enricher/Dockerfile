@@ -15,5 +15,9 @@ RUN pip install -r requirements.txt
 
 COPY app.py .
 
+COPY entrypoint-init-ollama.sh /usr/local/bin/entrypoint-init-ollama.sh
+RUN chmod +x /usr/local/bin/entrypoint-init-ollama.sh
+
 EXPOSE 8090
+ENTRYPOINT ["/usr/local/bin/entrypoint-init-ollama.sh"]
 CMD ["uvicorn", "app:api", "--host", "0.0.0.0", "--port", "8090"]
