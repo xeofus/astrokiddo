@@ -8,9 +8,6 @@ app:
     imagesBaseUrl: ${IMAGES_BASE_URL}
   enricher:
     baseUrl: ${ENRICHER_BASE_URL}
-    enabled: ${ENRICHER_ENABLED}
-    maxVocabulary: ${ENRICHER_MAX_VOCAB}
-    temperature: ${ENRICHER_TEMPERATURE}
 logging:
   level:
     root: INFO
