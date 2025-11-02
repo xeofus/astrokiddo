@@ -9,11 +9,11 @@ app:
   cloudflare:
     enabled: ${CF_AI_ENABLED:true}
     baseUrl: ${CF_AI_BASE_URL:https://api.cloudflare.com}
-    accountId: ${1<REDACTED>2}
+    accountId: ${CF_ACCOUNT_ID}
     cf_ai_provider: ${CF_AI_PROVIDER:@cf}
     cf_ai_vendor: ${CF_AI_VENDOR:meta}
     cf_ai_model: ${CF_AI_MODEL:llama-3-8b-instruct}
-    apiToken: ${1<REDACTED>2}
+    apiToken: ${CF_API_TOKEN}
     maxVocabulary: ${CF_AI_MAX_VOCAB:3}
     temperature: ${CF_AI_TEMPERATURE:0.6}
 logging:
