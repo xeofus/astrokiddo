@@ -4,10 +4,18 @@ server:
 app:
   nasa:
     apiKey: ${NASA_API_KEY}
-    apodBaseUrl: ${APOD_BASE_URL}
-    imagesBaseUrl: ${IMAGES_BASE_URL}
-  enricher:
-    baseUrl: ${ENRICHER_BASE_URL}
+    apodBaseUrl: ${APOD_BASE_URL:https://api.nasa.gov/planetary/apod}
+    imagesBaseUrl: ${IMAGES_BASE_URL:https://images-api.nasa.gov}
+  cloudflare:
+    enabled: ${CF_AI_ENABLED:true}
+    baseUrl: ${CF_AI_BASE_URL:https://api.cloudflare.com}
+    accountId: ${CF_ACCOUNT_ID:8e189b95a07e44243cb6b883466a9457}
+    cf_ai_provider: ${CF_AI_PROVIDER:@cf}
+    cf_ai_vendor: ${CF_AI_VENDOR:meta}
+    cf_ai_model: ${CF_AI_MODEL:llama-3-8b-instruct}
+    apiToken: ${CF_API_TOKEN:4-cFwAM5cJDSaCifBMj0_eouxTHWh0oV7WhXzMtr}
+    maxVocabulary: ${CF_AI_MAX_VOCAB:3}
+    temperature: ${CF_AI_TEMPERATURE:0.6}
 logging:
   level:
     root: INFO

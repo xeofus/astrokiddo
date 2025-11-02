@@ -1,58 +1,20 @@
 services:
-  ollama:
-    image: ollama/ollama:latest
-    container_name: astrokiddo-ollama
-    expose:
-      - "11434"
-    environment:
-      - OLLAMA_NUM_PARALLEL=${OLLAMA_NUM_PARALLEL}
-      - OLLAMA_NUM_THREADS=${OLLAMA_NUM_THREADS}
-      - OLLAMA_MAX_LOADED_MODELS=1
-    volumes:
-      - ./ollama:/root/.ollama
-    healthcheck:
-      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || wget -q -O- http://127.0.0.1:11434/ >/dev/null 2>&1 || exit 1"]
-      interval: 10s
-      timeout: 3s
-      retries: 15
-      start_period: 30s
-    restart: unless-stopped
-    networks:
-      - ai_net
-
-  enricher:
-    build: ./enricher
-    container_name: astrokiddo-enricher
-    depends_on:
-      ollama:
-        condition: service_healthy
-    environment:
-      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL}
-      - OLLAMA_MODEL=${OLLAMA_MODEL}
-      - OLLAMA_NUM_CTX=${OLLAMA_NUM_CTX}
-      - OLLAMA_WARMUP=${OLLAMA_WARMUP}
-    expose:
-      - "8090"
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:8090/health > /dev/null || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
-    restart: unless-stopped
-    networks:
-      - ai_net
-
   backend:
     build: .
     container_name: astrokiddo-backend
-    depends_on:
-      enricher:
-        condition: service_healthy
     expose:
       - "8091"
     environment:
       - SERVER_PORT=8091
-      - ENRICHER_BASE_URL=${ENRICHER_BASE_URL}
+      - CF_API_TOKEN=${CF_API_TOKEN}
+      - CF_ACCOUNT_ID=${CF_ACCOUNT_ID}
+      - CF_AI_PROVIDER=${CF_AI_PROVIDER}
+      - CF_AI_VENDOR=${CF_AI_VENDOR}
+      - CF_AI_MODEL=${CF_AI_MODEL}
+      - CF_AI_BASE_URL=${CF_AI_BASE_URL}
+      - CF_AI_ENABLED=${CF_AI_ENABLED}
+      - CF_AI_MAX_VOCAB=${CF_AI_MAX_VOCAB}
+      - CF_AI_TEMPERATURE=${CF_AI_TEMPERATURE}
       - APOD_BASE_URL=${APOD_BASE_URL}
       - IMAGES_BASE_URL=${IMAGES_BASE_URL}
       - NASA_API_KEY=${NASA_API_KEY}
