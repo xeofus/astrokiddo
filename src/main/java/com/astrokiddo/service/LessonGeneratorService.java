@@ -1,10 +1,10 @@
 package com.astrokiddo.service;
 
+import com.astrokiddo.ai.CloudflareAiRecords;
+import com.astrokiddo.ai.CloudflareAiService;
 import com.astrokiddo.dto.ApodResponseDto;
 import com.astrokiddo.dto.GenerateDeckRequestDto;
 import com.astrokiddo.dto.ImageSearchResponseDto;
-import com.astrokiddo.enrich.EnricherClient;
-import com.astrokiddo.enrich.EnrichmentResponse;
 import com.astrokiddo.model.LessonDeck;
 import com.astrokiddo.model.Slide;
 import com.astrokiddo.nasa.NasaReactiveCache;
@@ -22,11 +22,11 @@ public class LessonGeneratorService {
 
     private final ContentTemplateEngine engine = new ContentTemplateEngine();
     private final NasaReactiveCache cache;
-    private final EnricherClient enricherClient;
+    private final CloudflareAiService aiService;
 
-    public LessonGeneratorService(NasaReactiveCache cache, EnricherClient enricherClient) {
+    public LessonGeneratorService(NasaReactiveCache cache, CloudflareAiService aiService) {
         this.cache = cache;
-        this.enricherClient = enricherClient;
+        this.aiService = aiService;
     }
 
     // TODO: turn off minusMonth after shutdown
@@ -45,10 +45,7 @@ public class LessonGeneratorService {
                 .flatMap(tuple -> {
                     ImageSearchResponseDto imgDto = tuple.getT1();
                     ApodResponseDto apodDto = tuple.getT2();
-
-                    Mono<EnrichmentResponse> enrichmentMono = enricherClient.enrich(apodDto, req.getGradeLevel())
-                            .defaultIfEmpty(EnrichmentResponse.empty());
-
+                    Mono<CloudflareAiRecords.EnrichmentResponse> enrichmentMono = aiService.enrich(apodDto, req.getGradeLevel());
                     return enrichmentMono.map(enrichment -> buildDeck(topic, req.getGradeLevel(), imgDto, apodDto, enrichment));
                 });
     }
@@ -61,7 +58,7 @@ public class LessonGeneratorService {
     }
 
     private LessonDeck buildDeck(String topic, String gradeLevel, ImageSearchResponseDto imgDto,
-                                 ApodResponseDto apodDto, EnrichmentResponse enrichment) {
+                                 ApodResponseDto apodDto, CloudflareAiRecords.EnrichmentResponse enrichment) {
         List<ImageSearchResponseDto.Item> items = new ArrayList<>(extractImageItems(imgDto));
         items.removeIf(Objects::isNull);
 
@@ -94,28 +91,28 @@ public class LessonGeneratorService {
         return deck;
     }
 
-    private void applyEnrichment(EnrichmentResponse enrichment, Slide key, Slide explanation,
+    private void applyEnrichment(CloudflareAiRecords.EnrichmentResponse enrichment, Slide key, Slide explanation,
                                  Slide why, Slide question, Slide further, String gradeLevel) {
         if (enrichment == null) {
             return;
         }
         if (enrichment.hasHook()) {
-            key.setText(enrichment.getHook());
+            key.setText(enrichment.hook());
         }
         if (enrichment.hasAttribution()) {
-            key.setAttribution(enrichment.getAttribution());
+            key.setAttribution(enrichment.attribution());
         }
         if (enrichment.hasSimpleExplanation()) {
-            explanation.setText(enrichment.getSimpleExplanation());
+            explanation.setText(enrichment.simpleExplanation());
             if (enrichment.hasAttribution()) {
-                explanation.setAttribution(enrichment.getAttribution());
+                explanation.setAttribution(enrichment.attribution());
             }
         }
         if (enrichment.hasWhyItMatters()) {
-            why.setText(enrichment.getWhyItMatters());
+            why.setText(enrichment.whyItMatters());
         }
         if (enrichment.hasClassQuestion()) {
-            String enrichedQuestion = enrichment.getClassQuestion().trim();
+            String enrichedQuestion = enrichment.classQuestion().trim();
             String normalizedGrade = normalizeGradeLevel(gradeLevel);
             if (normalizedGrade != null && !enrichedQuestion.toLowerCase().contains("grade")) {
                 enrichedQuestion = enrichedQuestion + " (Align difficulty for grade " + normalizedGrade + ")";
@@ -124,7 +121,7 @@ public class LessonGeneratorService {
         }
         if (enrichment.hasFunFact()) {
             String base = defaultString(further.getText());
-            String funFact = "Fun fact: " + enrichment.getFunFact();
+            String funFact = "Fun fact: " + enrichment.funFact();
             if (base.isEmpty()) {
                 further.setText(funFact);
             } else if (!base.contains(funFact)) {
