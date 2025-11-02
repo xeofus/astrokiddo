@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -41,8 +43,8 @@ public class WebClientConfig {
     }
 
     @Bean
-    public ConnectionProvider enricherConnProvider() {
-        return ConnectionProvider.builder("enricher")
+    public ConnectionProvider cloudflareAiConnProvider() {
+        return ConnectionProvider.builder("cloudflare-ai")
                 .maxConnections(20)
                 .pendingAcquireTimeout(Duration.ofSeconds(5))
                 .maxIdleTime(Duration.ofSeconds(30))
@@ -51,8 +53,15 @@ public class WebClientConfig {
     }
 
     @Bean
-    public WebClient enricherWebClient(EnricherProperties props, ConnectionProvider enricherConnProvider) {
-        return base(props.getBaseUrl(), enricherConnProvider);
+    public WebClient cloudflareAiWebClient(CloudflareAiProperties props, ConnectionProvider cloudflareAiConnProvider) {
+        WebClient base = base(props.getBaseUrl(), cloudflareAiConnProvider);
+        WebClient.Builder builder = base.mutate()
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
+        if (StringUtils.hasText(props.getApiToken())) {
+            builder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + props.getApiToken());
+        }
+        return builder.build();
     }
 
     private WebClient base(String baseUrl, ConnectionProvider provider) {

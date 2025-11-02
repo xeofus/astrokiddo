@@ -1,9 +1,9 @@
 package com.astrokiddo.service;
 
+import com.astrokiddo.ai.CloudflareAiService;
 import com.astrokiddo.dto.ApodResponseDto;
 import com.astrokiddo.dto.GenerateDeckRequestDto;
 import com.astrokiddo.dto.ImageSearchResponseDto;
-import com.astrokiddo.enrich.EnricherClient;
 import com.astrokiddo.enrich.EnrichmentResponse;
 import com.astrokiddo.model.LessonDeck;
 import com.astrokiddo.model.Slide;
@@ -22,11 +22,11 @@ public class LessonGeneratorService {
 
     private final ContentTemplateEngine engine = new ContentTemplateEngine();
     private final NasaReactiveCache cache;
-    private final EnricherClient enricherClient;
+    private final CloudflareAiService aiService;
 
-    public LessonGeneratorService(NasaReactiveCache cache, EnricherClient enricherClient) {
+    public LessonGeneratorService(NasaReactiveCache cache, CloudflareAiService aiService) {
         this.cache = cache;
-        this.enricherClient = enricherClient;
+        this.aiService = aiService;
     }
 
     // TODO: turn off minusMonth after shutdown
@@ -46,7 +46,7 @@ public class LessonGeneratorService {
                     ImageSearchResponseDto imgDto = tuple.getT1();
                     ApodResponseDto apodDto = tuple.getT2();
 
-                    Mono<EnrichmentResponse> enrichmentMono = enricherClient.enrich(apodDto, req.getGradeLevel())
+                    Mono<EnrichmentResponse> enrichmentMono = aiService.enrich(apodDto, req.getGradeLevel())
                             .defaultIfEmpty(EnrichmentResponse.empty());
 
                     return enrichmentMono.map(enrichment -> buildDeck(topic, req.getGradeLevel(), imgDto, apodDto, enrichment));
