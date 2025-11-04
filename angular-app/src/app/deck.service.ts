@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 
 export interface Slide {
@@ -44,20 +44,40 @@ export interface GenerateReq {
     locale?: string;
 }
 
+export interface ApodResponse {
+  date?: string;
+  title?: string;
+  explanation?: string;
+  media_type?: string;
+  url?: string;
+  hdurl?: string;
+  thumbnail_url?: string;
+  copyright?: string;
+  service_version?: string;
+}
+
 @Injectable({providedIn: 'root'})
 export class DeckService {
-    constructor(private http: HttpClient) {
-    }
+  constructor(private http: HttpClient) {
+  }
 
-    generate(req: GenerateReq): Observable<LessonDeck> {
-        return this.http.post<LessonDeck>('/api/decks/generate', req);
-    }
+  generate(req: GenerateReq): Observable<LessonDeck> {
+      return this.http.post<LessonDeck>('/api/decks/generate', req);
+  }
 
-    exportHtml(id: string): Observable<Blob> {
-        return this.http.get(`/api/decks/${id}/export/html`, {responseType: 'blob'});
-    }
+  exportHtml(id: string): Observable<Blob> {
+      return this.http.get(`/api/decks/${id}/export/html`, {responseType: 'blob'});
+  }
 
-    exportPdf(id: string): Observable<Blob> {
-        return this.http.get(`/api/decks/${id}/export/pdf`, {responseType: 'blob'});
+  exportPdf(id: string): Observable<Blob> {
+      return this.http.get(`/api/decks/${id}/export/pdf`, {responseType: 'blob'});
+  }
+
+  apod(date?: string): Observable<ApodResponse> {
+    let params = new HttpParams();
+    if (date) {
+      params = params.set('date', date);
     }
+    return this.http.get<ApodResponse>('/api/apod', {params});
+  }
 }

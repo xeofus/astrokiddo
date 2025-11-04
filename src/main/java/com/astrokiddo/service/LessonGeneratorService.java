@@ -2,7 +2,6 @@ package com.astrokiddo.service;
 
 import com.astrokiddo.ai.CloudflareAiRecords;
 import com.astrokiddo.ai.CloudflareAiService;
-import com.astrokiddo.dto.ApodResponseDto;
 import com.astrokiddo.dto.GenerateDeckRequestDto;
 import com.astrokiddo.dto.ImageSearchResponseDto;
 import com.astrokiddo.model.LessonDeck;
@@ -12,7 +11,6 @@ import com.astrokiddo.templates.ContentTemplateEngine;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -29,25 +27,18 @@ public class LessonGeneratorService {
         this.aiService = aiService;
     }
 
-    // TODO: turn off minusMonth after shutdown
     public Mono<LessonDeck> generate(GenerateDeckRequestDto req) {
         String topic = req.getTopic().trim();
         Mono<ImageSearchResponseDto> images =
                 cache.searchImages(topic, "image", null, null)
                 .switchIfEmpty(Mono.just(new ImageSearchResponseDto()))
                 .onErrorReturn(new ImageSearchResponseDto());
-        Mono<ApodResponseDto> apod =
-                cache.getApod(LocalDate.now().minusMonths(2))
-                .switchIfEmpty(Mono.just(new ApodResponseDto()))
-                .onErrorResume(ex -> Mono.just(new ApodResponseDto()));
-
-        return Mono.zip(images, apod)
-                .flatMap(tuple -> {
-                    ImageSearchResponseDto imgDto = tuple.getT1();
-                    ApodResponseDto apodDto = tuple.getT2();
-                    Mono<CloudflareAiRecords.EnrichmentResponse> enrichmentMono = aiService.enrich(apodDto, req.getGradeLevel());
-                    return enrichmentMono.map(enrichment -> buildDeck(topic, req.getGradeLevel(), imgDto, apodDto, enrichment));
-                });
+        return images.flatMap(imgDto ->
+                aiService.enrich(null, req.getGradeLevel())
+                        .onErrorResume(ex -> Mono.empty())
+                        .map(enrichment -> buildDeck(topic, req.getGradeLevel(), imgDto, enrichment))
+                        .switchIfEmpty(Mono.defer(() -> Mono.just(buildDeck(topic, req.getGradeLevel(), imgDto, null))))
+        );
     }
 
     private List<ImageSearchResponseDto.Item> extractImageItems(ImageSearchResponseDto resp) {
@@ -58,7 +49,7 @@ public class LessonGeneratorService {
     }
 
     private LessonDeck buildDeck(String topic, String gradeLevel, ImageSearchResponseDto imgDto,
-                                 ApodResponseDto apodDto, CloudflareAiRecords.EnrichmentResponse enrichment) {
+                                 CloudflareAiRecords.EnrichmentResponse enrichment) {
         List<ImageSearchResponseDto.Item> items = new ArrayList<>(extractImageItems(imgDto));
         items.removeIf(Objects::isNull);
 
@@ -71,7 +62,7 @@ public class LessonGeneratorService {
         List<Slide> slides = new ArrayList<>();
 
         Slide key = engine.keyVisualFromImageItem(keyVisualItem);
-        Slide explanation = engine.explanation(topic, apodDto, explanationItem);
+        Slide explanation = engine.explanation(topic, explanationItem);
         Slide why = engine.whyItMatters(topic);
         Slide question = engine.questionForClass(topic, gradeLevel);
         Slide further = engine.furtherReading(topic, furtherReadingItem);

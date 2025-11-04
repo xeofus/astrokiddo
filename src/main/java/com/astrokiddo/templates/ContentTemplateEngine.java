@@ -1,6 +1,5 @@
 package com.astrokiddo.templates;
 
-import com.astrokiddo.dto.ApodResponseDto;
 import com.astrokiddo.dto.ImageSearchResponseDto;
 import com.astrokiddo.model.Slide;
 import com.astrokiddo.model.SlideType;
@@ -17,18 +16,13 @@ public class ContentTemplateEngine {
         return new Slide(SlideType.KEY_VISUAL, title, text, imageUrl, attribution);
     }
 
-    public Slide explanation(String topic, ApodResponseDto apod, ImageSearchResponseDto.Item contextItem) {
+    public Slide explanation(String topic, ImageSearchResponseDto.Item contextItem) {
         String title = "What is " + topic + "?";
 
-        String apodText = (apod != null ? apod.getExplanation() : null);
-        String text = isBlank(apodText)
-                ? shorten(firstDescription(contextItem, "A concise overview focusing on key physical concepts and observational evidence."), 600)
-                : shorten(apodText, 600);
+        String text = shorten(firstDescription(contextItem, "A concise overview focusing on key physical concepts and observational evidence."), 600);
+        String img = bestImageHref(contextItem);
 
-        String apodUrl = (apod != null ? apod.getUrl() : null);
-        String img = !isBlank(apodUrl) ? apodUrl : bestImageHref(contextItem);
-
-        return new Slide(SlideType.EXPLANATION, title, text, img, "APOD / NASA");
+        return new Slide(SlideType.EXPLANATION, title, text, img, "NASA Image & Video Library");
     }
 
     public Slide whyItMatters(String topic) {

@@ -20,6 +20,38 @@
     }
   </div>
 
+  @if (apod) {
+    <div class="panel apod">
+      <div class="apod-title">
+        <h2>{{ apod.title || 'Astronomy Picture of the Day' }}</h2>
+        @if (apod.date) {
+          <div class="apod-date">{{ apod.date | date: 'longDate' }}</div>
+        }
+      </div>
+      @if (apod.media_type === 'image' && apod.url) {
+        <img class="apod-image" [src]="apod.url" [alt]="apod.title || 'Astronomy Picture of the Day'">
+      }
+      @else if (apod.thumbnail_url) {
+        <img class="apod-image" [src]="apod.thumbnail_url" [alt]="apod.title || 'Astronomy Picture of the Day'">
+      }
+      <p>{{ apod.explanation }}</p>
+      <div class="apod-footer">
+        @if (apod.media_type && apod.url && apod.media_type !== 'image') {
+          <a class="apod-link" [href]="apod.url" target="_blank" rel="noopener">View media</a>
+        }
+        @if (apod.copyright) {
+          <span>© {{ apod.copyright }}</span>
+        }
+      </div>
+    </div>
+  }
+
+  @if (!apod && apodError) {
+    <div class="panel">
+      <div class="warn">{{ apodError }}</div>
+    </div>
+  }
+
   @if (deck) {
     <div class="deck">
       <div class="panel deck-meta">
