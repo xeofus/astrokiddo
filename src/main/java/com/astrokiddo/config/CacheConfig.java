@@ -16,7 +16,7 @@ public class CacheConfig {
     public Cache<String, Mono<ApodResponseDto>> apodCache() {
         return Caffeine.newBuilder()
                 .maximumSize(365)
-                .expireAfterWrite(Duration.ofHours(12))
+                .expireAfterWrite(Duration.ofHours(24))
                 .recordStats()
                 .build();
     }

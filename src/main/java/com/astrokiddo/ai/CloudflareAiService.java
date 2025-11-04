@@ -43,12 +43,12 @@ public class CloudflareAiService {
         log.info("Request: {}", request);
         return client.post()
                 .uri(b -> b.path("/client/v4/accounts/{accountId}/ai/run/")
-                        .pathSegment("{cf_ai_provider}", "{cf_ai_vendor}", "{cf_ai_model}")
+                        .pathSegment("{cfAiProvider}", "{cfAiVendor}", "{cfAiModel}")
                         .build(
                                 properties.getAccountId(),
-                                properties.getCf_ai_provider(),
-                                properties.getCf_ai_vendor(),
-                                properties.getCf_ai_model()
+                                properties.getCfAiProvider(),
+                                properties.getCfAiVendor(),
+                                properties.getCfAiModel()
                         )
                 )
                 .contentType(MediaType.APPLICATION_JSON)

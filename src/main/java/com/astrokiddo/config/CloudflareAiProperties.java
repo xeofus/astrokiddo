@@ -12,20 +12,20 @@ import org.springframework.context.annotation.Configuration;
 public class CloudflareAiProperties {
     private String baseUrl;
     private String accountId;
-    private String cf_ai_provider;
-    private String cf_ai_vendor;
-    private String cf_ai_model;
+    private String cfAiProvider;
+    private String cfAiVendor;
+    private String cfAiModel;
     private String apiToken;
     private boolean enabled = true;
     private int maxVocabulary = 3;
     private double temperature = 0.6;
 
     public String getModel() {
-        return cf_ai_provider + "/" + cf_ai_vendor + "/" + cf_ai_model;
+        return cfAiProvider + "/" + cfAiVendor + "/" + cfAiModel;
     }
 
     public boolean isConfigured() {
-        return hasText(accountId) && hasText(cf_ai_provider) && hasText(cf_ai_vendor) && hasText(cf_ai_model) && hasText(apiToken);
+        return hasText(accountId) && hasText(cfAiProvider) && hasText(cfAiVendor) && hasText(cfAiModel) && hasText(apiToken);
     }
 
     private boolean hasText(String value) {

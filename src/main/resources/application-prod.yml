@@ -19,7 +19,4 @@ app:
 logging:
   level:
     root: INFO
-    com.astrokiddo: DEBUG
-springdoc:
-  api-docs:
-    version: OPENAPI_3_0
+    com.astrokiddo: INFO

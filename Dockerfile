@@ -3,9 +3,9 @@
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml .
-RUN mvn -q -e -DskipTests dependency:go-offline
+RUN mvn -q -e -P prod -DskipTests dependency:go-offline
 COPY src ./src
-RUN mvn -q -DskipTests package
+RUN mvn -q -P prod -DskipTests package
 
 # Run
 FROM eclipse-temurin:17-jre

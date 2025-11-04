@@ -18,3 +18,10 @@ button{cursor:pointer;background:var(--accent);border-color:transparent;color:#0
 a.btn{display:inline-block;padding:10px 12px;border-radius:12px;background:#223044;color:#cfe2ff;text-decoration:none;border:1px solid var(--border)}
 a.btn:hover{background:#294567}
 .warn{color:#ffc078}
+.apod{display:grid;gap:12px}
+.apod-title{display:flex;flex-direction:column;gap:4px}
+.apod-date{color:var(--muted);font-size:14px}
+.apod-image{max-width:100%;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.apod-footer{display:flex;gap:12px;align-items:center;color:var(--muted);font-size:13px}
+.apod-link{color:var(--accent)}
+.apod-link:hover{text-decoration:underline}
