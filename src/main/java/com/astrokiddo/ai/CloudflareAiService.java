@@ -1,14 +1,12 @@
 package com.astrokiddo.ai;
 
 import com.astrokiddo.config.CloudflareAiProperties;
-import com.astrokiddo.dto.ApodResponseDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -32,14 +30,11 @@ public class CloudflareAiService {
         this.properties = properties;
     }
 
-    public Mono<CloudflareAiRecords.EnrichmentResponse> enrich(ApodResponseDto apod, String gradeLevel) {
-        if (!properties.isEnabled() || apod == null || !properties.isConfigured()) {
+    public Mono<CloudflareAiRecords.EnrichmentResponse> enrich(String topic, String gradeLevel) {
+        if (!properties.isEnabled() || !properties.isConfigured()) {
             return Mono.empty();
         }
-        if (!StringUtils.hasText(apod.getTitle()) || !StringUtils.hasText(apod.getExplanation())) {
-            return Mono.empty();
-        }
-        CloudflareAiRequest request = buildRequest(apod, gradeLevel);
+        CloudflareAiRequest request = buildRequest(topic, gradeLevel);
         log.info("Request: {}", request);
         return client.post()
                 .uri(b -> b.path("/client/v4/accounts/{accountId}/ai/run/")
@@ -70,9 +65,9 @@ public class CloudflareAiService {
                 || (throwable.getCause() != null && throwable.getCause() instanceof java.io.IOException);
     }
 
-    private CloudflareAiRequest buildRequest(ApodResponseDto apod, String gradeLevel) {
+    private CloudflareAiRequest buildRequest(String topic, String gradeLevel) {
         String systemPrompt = buildSystemPrompt();
-        String userPrompt = buildUserPrompt(apod, gradeLevel);
+        String userPrompt = buildUserPrompt(topic, gradeLevel);
 
         CloudflareAiMessage systemMessage = new CloudflareAiMessage("system", systemPrompt);
 
@@ -89,10 +84,10 @@ public class CloudflareAiService {
                 "Keep vocabulary entries to at most " + Math.max(0, properties.getMaxVocabulary()) + " items.";
     }
 
-    private String buildUserPrompt(ApodResponseDto apod, String gradeLevel) {
+    private String buildUserPrompt(String topic, String gradeLevel) {
         return "Create enrichment material for a classroom lesson about NASA's Astronomy Picture of the Day." +
                 "Focus on keeping explanations accessible for grade " + gradeLevel + " students." +
-                "Title: " + apod.getTitle() +
+                "Title: " + topic +
                 "Provide up to " + Math.max(0, properties.getMaxVocabulary()) + " vocabulary items." +
                 "Make the class_question actionable for classroom discussion." +
                 "Include a fun_fact when possible and cite attribution if a source is obvious." +

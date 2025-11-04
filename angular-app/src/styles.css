@@ -15,8 +15,9 @@ button{cursor:pointer;background:var(--accent);border-color:transparent;color:#0
 .card img{max-width:100%;border-radius:12px;margin:8px 0}
 .badge{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .footer{display:flex;gap:8px;margin-top:8px}
-a.btn{display:inline-block;padding:10px 12px;border-radius:12px;background:#223044;color:#cfe2ff;text-decoration:none;border:1px solid var(--border)}
-a.btn:hover{background:#294567}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 12px;border-radius:12px;background:#223044;color:#cfe2ff;text-decoration:none;border:1px solid var(--border);cursor:pointer;font-weight:600;gap:6px}
+.btn:hover{background:#294567}
+.btn svg{width:16px;height:16px}
 .warn{color:#ffc078}
 .apod{display:grid;gap:12px}
 .apod-title{display:flex;flex-direction:column;gap:4px}

@@ -34,7 +34,7 @@ public class LessonGeneratorService {
                 .switchIfEmpty(Mono.just(new ImageSearchResponseDto()))
                 .onErrorReturn(new ImageSearchResponseDto());
         return images.flatMap(imgDto ->
-                aiService.enrich(null, req.getGradeLevel())
+                aiService.enrich(req.getTopic(), req.getGradeLevel())
                         .onErrorResume(ex -> Mono.empty())
                         .map(enrichment -> buildDeck(topic, req.getGradeLevel(), imgDto, enrichment))
                         .switchIfEmpty(Mono.defer(() -> Mono.just(buildDeck(topic, req.getGradeLevel(), imgDto, null))))

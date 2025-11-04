@@ -1,8 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import {ApodResponse, DeckEnrichment, DeckService, GenerateReq, LessonDeck} from './deck.service';
-import {saveAs} from 'file-saver-es';
 import {firstValueFrom} from "rxjs";
 
 @Component({
@@ -11,7 +10,7 @@ import {firstValueFrom} from "rxjs";
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
 
   public form: FormGroup;
   public deck?: LessonDeck;
@@ -19,7 +18,12 @@ export class AppComponent implements OnInit {
   public error?: string;
   public apod?: ApodResponse;
   public apodError?: string;
+  public showSlideshow = false;
+  public lastRequest?: GenerateReq;
 
+  @ViewChild('revealRoot') private revealRoot?: ElementRef<HTMLDivElement>;
+  private revealInstance: any;
+  private revealInitTimeout?: number;
 
   constructor(private deckSvc: DeckService) {
       this.form = new FormGroup({
@@ -37,6 +41,10 @@ export class AppComponent implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    this.destroyReveal();
+  }
+
   // @ts-ignore
   async generate() {
       this.error = undefined;
@@ -49,6 +57,70 @@ export class AppComponent implements OnInit {
       } finally {
           this.loading = false;
       }
+  }
+
+  openSlideshow() {
+    if (!this.deck) {
+      return;
+    }
+    this.showSlideshow = true;
+    if (this.revealInitTimeout) {
+      window.clearTimeout(this.revealInitTimeout);
+    }
+    this.revealInitTimeout = window.setTimeout(() => this.initializeReveal(), 0);
+  }
+
+  closeSlideshow() {
+    this.showSlideshow = false;
+    if (this.revealInitTimeout) {
+      window.clearTimeout(this.revealInitTimeout);
+      this.revealInitTimeout = undefined;
+    }
+    this.destroyReveal();
+  }
+
+  private initializeReveal() {
+    if (!this.deck) {
+      return;
+    }
+    const container = this.revealRoot?.nativeElement;
+    const revealGlobal = (window as any).Reveal;
+    if (!revealGlobal || !container) {
+      console.warn('Reveal.js failed to load.');
+      return;
+    }
+
+    this.destroyReveal();
+
+    this.revealInstance = new revealGlobal({
+      container,
+      embedded: true,
+      hash: false,
+      controls: true,
+      progress: true,
+      transition: 'slide',
+      backgroundTransition: 'fade'
+    });
+
+    if (typeof this.revealInstance.initialize === 'function') {
+      this.revealInstance.initialize();
+    }
+    if (typeof this.revealInstance.sync === 'function') {
+      this.revealInstance.sync();
+    }
+    if (typeof this.revealInstance.layout === 'function') {
+      this.revealInstance.layout();
+    }
+    if (typeof this.revealInstance.slide === 'function') {
+      this.revealInstance.slide(0);
+    }
+  }
+
+  private destroyReveal() {
+    if (this.revealInstance && typeof this.revealInstance.destroy === 'function') {
+      this.revealInstance.destroy();
+    }
+    this.revealInstance = undefined;
   }
 
   hasEnrichment(enrichment?: DeckEnrichment | null): boolean {
@@ -70,15 +142,5 @@ export class AppComponent implements OnInit {
       const hasVocabulary = Array.isArray(vocabulary) && vocabulary.length > 0;
 
       return hasText || hasVocabulary;
-  }
-
-  exportHtml() {
-      if (!this.deck) return;
-      this.deckSvc.exportHtml(this.deck.id).subscribe(b => saveAs(b, (this.deck?.topic || 'deck') + '.html'));
-  }
-
-  exportPdf() {
-      if (!this.deck) return;
-      this.deckSvc.exportPdf(this.deck.id).subscribe(b => saveAs(b, (this.deck?.topic || 'deck') + '.pdf'));
   }
 }

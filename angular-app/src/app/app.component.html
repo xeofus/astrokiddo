@@ -1,6 +1,6 @@
 <div class="container">
-  <h1>AstroKiddo: Teacher Deck Builder</h1>
-  <div class="sub">Generate a 5-slide mini-lesson from NASA media and export to HTML/PDF.</div>
+  <h1>AstroKiddo: CIS Final Project</h1>
+  <div class="sub">Generate a slideshow from NASA media and view.</div>
 
   <div class="panel">
     <div class="row">
@@ -64,8 +64,7 @@
           }
         </div>
         <div class="meta-actions">
-          <a class="btn" (click)="exportHtml()">⬇ Export HTML</a>
-          <a class="btn" (click)="exportPdf()">⬇ Export PDF</a>
+          <button type="button" class="btn" (click)="openSlideshow()">▶ Play Slideshow</button>
         </div>
       </div>
       @if (deck.enrichment; as enrich) {
@@ -143,3 +142,99 @@
     </div>
   }
 </div>
+
+@if (deck && showSlideshow) {
+  <div class="slideshow-overlay" role="dialog" aria-modal="true">
+    <div class="slideshow-backdrop" (click)="closeSlideshow()"></div>
+    <div class="slideshow-stage">
+      <button type="button" class="slideshow-close" (click)="closeSlideshow()" aria-label="Close slideshow">✕</button>
+      <div class="slideshow-wrapper">
+        <div class="reveal" #revealRoot>
+          <div class="slides">
+            <section>
+              <h2>{{ deck.topic }}</h2>
+              @if (lastRequest?.gradeLevel) {
+                <div class="cover-meta">Grade Level: {{ lastRequest.gradeLevel }}</div>
+              }
+              <div class="cover-meta">Deck ID: {{ deck.id }}</div>
+              <div class="cover-meta">Generated: {{ deck.createdAt | date: 'medium' }}</div>
+              @if (deck.enrichment?.meta?.model) {
+                <div class="enrichment-chip">Model · {{ deck.enrichment.meta.model }}</div>
+              }
+              @if (deck.enrichment?.hook) {
+                <div class="cover-sub">{{ deck.enrichment.hook }}</div>
+              }
+            </section>
+
+            @for (slide of deck.slides; track slide) {
+              <section>
+                @if (slide.title) {
+                  <h3>{{ slide.title }}</h3>
+                }
+                @if (slide.imageUrl) {
+                  <img [src]="slide.imageUrl" [alt]="slide.title || 'Slide image'">
+                }
+                @if (slide.text) {
+                  <div class="slide-note">{{ slide.text }}</div>
+                }
+                <div class="slide-footer">{{ slide.type }}</div>
+                @if (slide.attribution) {
+                  <div class="slide-attribution">© {{ slide.attribution }}</div>
+                }
+              </section>
+            }
+
+            @if (deck.enrichment?.simple_explanation) {
+              <section>
+                <h3>Simple Explanation</h3>
+                <div class="slide-note">{{ deck.enrichment.simple_explanation }}</div>
+              </section>
+            }
+
+            @if (deck.enrichment?.why_it_matters) {
+              <section>
+                <h3>Why It Matters</h3>
+                <div class="slide-note">{{ deck.enrichment.why_it_matters }}</div>
+              </section>
+            }
+
+            @if (deck.enrichment?.class_question) {
+              <section>
+                <h3>Class Discussion</h3>
+                <div class="slide-note">{{ deck.enrichment.class_question }}</div>
+              </section>
+            }
+
+            @if (deck.enrichment?.fun_fact) {
+              <section>
+                <h3>Fun Fact</h3>
+                <div class="slide-note">{{ deck.enrichment.fun_fact }}</div>
+              </section>
+            }
+
+            @if (deck.enrichment?.vocabulary?.length) {
+              <section>
+                <h3 class="vocab-title">Vocabulary Spotlight</h3>
+                <ul>
+                  @for (term of deck.enrichment.vocabulary; track term) {
+                    <li>
+                      <div class="term">{{ term.term }}</div>
+                      <div class="definition">{{ term.definition }}</div>
+                    </li>
+                  }
+                </ul>
+              </section>
+            }
+
+            @if (deck.enrichment?.attribution) {
+              <section>
+                <h3>Enrichment Attribution</h3>
+                <div class="slide-note">{{ deck.enrichment.attribution }}</div>
+              </section>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
